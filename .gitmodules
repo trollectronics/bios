@@ -1,0 +1,18 @@
+[submodule "libs/trollibc"]
+	path = libs/trollibc
+	url = git@github.com:trollectronics/trollibc.git
+[submodule "libs/util"]
+	path = libs/util
+	url = git@github.com:trollectronics/util.git
+[submodule "libs/uCFAT"]
+	path = libs/uCFAT
+	url = git@github.com:trollectronics/uCFAT.git
+[submodule "libs/peripheral"]
+	path = libs/peripheral
+	url = git@github.com:trollectronics/peripheral.git
+[submodule "libs/terminal"]
+	path = libs/terminal
+	url = git@github.com:trollectronics/terminal.git
+[submodule "libs/posix-file"]
+	path = libs/posix-file
+	url = git@github.com:trollectronics/posix-file.git

@@ -3,7 +3,7 @@ TTYDEV		?=/dev/ttyUSB0
 TTYBAUD		?=115200
 
 # Name of the output file
-NAME		= project
+NAME		= bios
 
 # Linkscript
 LINKSCRIPT	= link.ld
