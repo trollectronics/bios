@@ -43,7 +43,7 @@ struct RomHeader {
 
 Menu menu_dir = {
 	list_dir,
-	"Attrib | Size  | Name\n-------+-------+----------------\n",
+	"Attrib | Size  | Name\n\t-------+-------+----------------\n",
 	true,
 	0,
 	8,
@@ -91,8 +91,8 @@ void pathcat(char *buf, const char *s1, const char *s2) {
 
 void list_dir(void *arg) {
 	terminal_clear();
-	printf("%s\n", path);
-	printf("%s", arg);
+	printf("\t%s\n", path);
+	printf("\t%s", arg);
 	
 	int files, fd, i, j, k;
 	
