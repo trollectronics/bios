@@ -95,13 +95,22 @@ static int fat_write_sd(uint32_t sector, uint8_t *data) {
 	return 0;
 }
 
-static void print_filesize(uint32_t filesize) {
+void print_filesize(uint32_t filesize) {
 	if(filesize < 1024)
 		printf("%u", filesize);
 	else if(filesize < 1024*1024)
 		printf("%uk", filesize/1024U);
 	else
 		printf("%uM", filesize/(1024U*1024U));
+}
+
+void sprint_filesize(char *buf, uint32_t filesize) {
+	if(filesize < 1024)
+		sprintf(buf, "%u", filesize);
+	else if(filesize < 1024*1024)
+		sprintf(buf, "%uk", filesize/1024U);
+	else
+		sprintf(buf, "%uM", filesize/(1024U*1024U));
 }
 
 static void clear_and_print(void *arg) {

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 #include <stdio.h>
 #include "filebrowse.h"
 #include "fat.h"
@@ -90,6 +91,7 @@ void pathcat(char *buf, const char *s1, const char *s2) {
 }
 
 void list_dir(void *arg) {
+	void sprint_filesize(char *buf, uint32_t filesize);
 	terminal_clear();
 	printf("\t%s\n", path);
 	printf("\t%s", arg);
@@ -103,6 +105,7 @@ void list_dir(void *arg) {
 	uint8_t stat;
 	struct FATDirList list[8];
 	char *buf, *tmp;
+	char fsize[16];
 	for(files = 0; (i = fat_dirlist(path, list, 8, files)); files += i) {
 		for (j = i - 1; j >= 0; j--) {
 			if(list[j].filename[0]) {
@@ -123,24 +126,19 @@ void list_dir(void *arg) {
 					else
 						*buf++ = '-';
 				}
+				
+				
+				
 				if(stat & 0x10) {
-					*buf++ = '\t';
-					*buf++ = '\t';
+					fsize[0] = 0;
 				} else {
 					pathcat((char *) pathbuf, path, list[j].filename);
 					fd = fat_open(pathbuf, O_RDONLY);
-					*buf++ = '\t';
-					//print_filesize(fat_fsize(fd));
-					*buf++ = '0';
-					*buf++ = '\t';
+					sprint_filesize(fsize, fat_fsize(fd));
 					fat_close(fd);
 				}
-				tmp = list[j].filename;
 				
-				while(*tmp) {
-					*buf++ = *tmp++;
-				}
-				*buf = 0;
+				sprintf(buf, "\t%s\t%s", fsize, list[j].filename);
 			}
 		}
 	}
