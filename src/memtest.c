@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "peripheral.h"
-#include "printf.h"
 
 #define BLOCK_SIZE 32768
 #define NO_BLOCKS 1024

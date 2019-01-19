@@ -1,9 +1,9 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 #include "filebrowse.h"
 #include "fat.h"
 #include "sd.h"
-#include "printf.h"
 #include "terminal.h"
 #include "input.h"
 #include "hexload.h"

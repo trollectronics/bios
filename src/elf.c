@@ -2,10 +2,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include "elf.h"
 #include "mmu040.h"
 #include "terminal.h"
-#include "printf.h"
 #include "mem.h"
 
 int (*(elf_load(void *elf, bool debug)))(int argc, char **argv) {

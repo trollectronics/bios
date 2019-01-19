@@ -1,6 +1,6 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "terminal.h"
-#include "printf.h"
 #include "input.h"
 #include "menu.h"
 

@@ -1,9 +1,9 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "uart.h"
 #include "fat.h"
 #include "peripheral.h"
 #include "terminal.h"
-#include "printf.h"
 #include "input.h"
 #include "main.h"
 

@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <stddef.h>
+#include <stdio.h>
 #include "terminal.h"
-#include "printf.h"
 #include "mmu040.h"
 #include "input.h"
 

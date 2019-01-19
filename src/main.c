@@ -1,9 +1,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <sys/file.h>
 #include "uart.h"
 #include "spi.h"
-#include "printf.h"
 #include "terminal.h"
 #include "menu.h"
 #include "sd.h"
@@ -231,11 +232,36 @@ static void test_lowres(void *arg) {
 	vga_hw[0] = 0x1;
 }
 
+size_t write_terminal(const void *ptr, size_t size, File *f) {
+	size_t i;
+	char *s = (char *) ptr;
+	
+	for(i = 0; i < size; i++)
+		terminal_putc_term(*s++);
+	
+	return size;
+}
+
+FileHandler fh_terminal = {
+	.open = NULL,
+	.close = NULL,
+	.read = NULL,
+	.write = write_terminal,
+};
+
+File file_terminal = {
+	.handler = &fh_terminal,
+};
+
 int main() {
 	int type;
 	char label[12];
 	
 	terminal_init();
+	
+	stdin = (FILE *) &file_terminal;
+	stdout = (FILE *) &file_terminal;
+	stderr = (FILE *) &file_terminal;
 	
 	printf("Detecting SD card: ");
 	if((type = sd_init()) == SD_CARD_TYPE_INVALID) {
