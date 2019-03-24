@@ -19,7 +19,7 @@ clean: $(SUBDIRS)
 
 $(SUBDIRS):
 	@echo " [ CD ] $(CURRENTPATH)$@/"
-	@+make -C "$@" $(MAKECMDGOALS)
+	@+make -C "$@" "CURRENTPATH=$(CURRENTPATH)$@/" $(MAKECMDGOALS)
 
 %.a: $(SUBDIRS)
 	@$(RM) $@

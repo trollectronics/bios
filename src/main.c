@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <sys/file.h>
 #include "uart.h"
@@ -19,12 +20,9 @@
 #include "main.h"
 
 static void clear_and_print(void *arg);
-static void test_spi_rom(void *arg);
 static void test_sdram(void *arg);
-static void test_lowres(void *arg);
 static void autoboot(void *arg);
-void color_demo(void *arg);
-static void test_sound(void *arg);
+static void test_dir(void *arg);
 
 uint8_t fat_buf[512];
 
@@ -44,16 +42,14 @@ Menu menu_main = {
 	"Trollectronics Trollbook BIOS\nMain menu\n----------------------------------------\n",
 	false,
 	0,
-	8,
+	7,
 	{
 		{"Boot kernel.elf", autoboot, (void *) false},
 		{"Debug kernel.elf", autoboot, (void *) true},
 		{"Browse SD card filesystem", menu_execute, &menu_dir},
 		{"Serial file transfer to SD", serial_transfer_recv, NULL},
-		{"Test SPI ROM", test_spi_rom, NULL},
-		//{"Test input", input_test_keyboard, NULL},
-		{"Test Low-res video mode", test_lowres, NULL},
 		{"SDRAM Memtest", test_sdram, NULL},
+		{"Test dir", test_dir, NULL},
 		{"Reboot", reboot, NULL},
 	},
 };
@@ -123,34 +119,6 @@ static void clear_and_print(void *arg) {
 	printf("%s", arg);
 }
 
-static void test_spi_rom(void *arg) {
-	uint8_t buf[256];
-	uint8_t *tmp;
-	int i, j, k;
-	
-	for(j = 0x5DD00; ; j += 256) {
-		terminal_clear();
-		rom_read(j, buf, 256);
-		for(i = 0; i < 256; i+=16) {
-			tmp =((uint8_t *) buf) + i;
-			printf("%04x\t%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\t\t", 
-				j + i,
-				tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], 
-				tmp[8], tmp[9], tmp[10], tmp[11], tmp[12], tmp[13], tmp[14], tmp[15]
-			);
-			for(k = 0; k < 16; k++) {
-				if(tmp[k] < 32 || tmp[k] > 126)
-					printf("%c", '.');
-				else
-					printf("%c", tmp[k]);
-			}
-			printf("\n");
-		}
-		
-		input_poll();
-	}
-}
-
 static void test_sdram(void *arg) {
 	terminal_clear();
 	
@@ -162,83 +130,28 @@ static void test_sdram(void *arg) {
 	input_poll();
 }
 
-void color_demo(void *arg) {
-	unsigned int i, col = 0;
-	for(;;) {
-		for(i = 0; i < 230; i++) {
-			terminal_set_fg(col++);
-			terminal_puts("Hello, world ");
-		}
-		terminal_set_fg(col++);
-		terminal_puts("Hello, wor");
-		terminal_set_pos(0, 0);
+
+static void test_dir(void *arg) {
+	DIR *d;
+	struct dirent *ent;
+	
+	terminal_clear();
+	
+	d = opendir("/");
+	
+	while((ent = readdir(d))) {
+		printf("%s\n", ent->d_name);
 	}
+	
+	closedir(d);
+	
+	for(;;);
+	input_poll();
 }
 
 static void autoboot(void *arg) {
 	bool debug = (bool) arg;
 	execute_elf_path("/KERNEL.ELF", debug);
-}
-
-static void test_sound(void *arg) {
-	volatile uint16_t *buf= (volatile uint16_t *) LLRAM_BASE;
-	volatile uint32_t *sound_hw = (volatile uint32_t *) PERIPHERAL_SOUND_BASE;
-	int buffer;
-	unsigned int i;
-	
-	for(i = 0; i < 1024; i++) {
-		buf[i] = 0;
-	}
-	
-	sound_hw[2] = 0x0;
-	sound_hw[3] = 3;
-	sound_hw[4] = 512;
-	buffer = sound_hw[1] & 0x1;
-	sound_hw[0] = 0x1;
-	
-	for(;;) {
-		sound_wait();
-		for(i = 0; i < 256; i++) {
-			buf[i] = 0xFFFF;
-		}
-		sound_wait();
-		for(i = 512; i < 768; i++) {
-			buf[i] = 0xFFFF;
-		}
-		sound_wait();
-		for(i = 0; i < 256; i++) {
-			buf[i] = 0x0;
-		}
-		sound_wait();
-		for(i = 512; i < 768; i++) {
-			buf[i] = 0x0;
-		}
-	}
-}
-
-static void test_lowres(void *arg) {
-	volatile uint8_t *buf= (volatile uint8_t *) LLRAM_BASE;
-	volatile uint32_t *vga_hw = (volatile uint32_t *) PERIPHERAL_VGA_BASE;
-	int i;
-	
-	//~ for(i = 0; i < 400*240/2; i++) {
-		//~ buf[i] = 0x1;
-		//~ buf[i + 400] = 0x2;
-	//~ }
-	
-	//~ for(i = 0; i < 400*240/2; i++) {
-		//~ buf[i + 128*1024] = 0x4;
-		//~ buf[i + 400 + 128*1024] = 0x5;
-	//~ }
-	
-	input_poll();
-	
-	vga_hw[0] = 0x3;
-	input_poll();
-	vga_hw[0] = 0x7;
-	input_poll();
-	
-	vga_hw[0] = 0x1;
 }
 
 size_t write_terminal(const void *ptr, size_t size, File *f) {
